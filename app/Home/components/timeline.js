@@ -52,7 +52,7 @@ const CenterContent = () => {
             <div class="news_feed_title">
               <img src="assets/user.png" alt="user" />
               <div class="news_feed_title_content">
-                <p>Codersbite Magazine</p>
+                <p>Amabee</p>
                 <span>
                   12h . <i class="fas fa-globe-americas"></i>
                 </span>
@@ -60,18 +60,19 @@ const CenterContent = () => {
             </div>
             <div class="news_feed_description">
               <p class="news_feed_subtitle">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quasi
-                esse cum id vero odit tempora dicta. Saepe corporis voluptatibus
-                laboriosam?
+                ikaw ang bugtong itik na nagkapakapa sa malapokon kong dughan ug
+                ikaw ang ting ting sa nag ga bagting sa akong kasing kasing ug
+                saksi ang mga unggoy nga naglangoy langoy gilid sa hagunoy sa
+                akong gugmang ikaw ra ang gi ila💘💖
               </p>
               <img src="assets/sunflower.jpg" alt="sunflower" />
               <div class="news_feed_description_title">
-                <span>YOUTUBE / CODERSBITE</span>
+                <span>GitHub / Amabee</span>
                 <p>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Nesciunt repudiandae exercitationem mollitia, suscipit labore
-                  rem reiciendis distinctio atque totam facere placeat officia
-                  ea quia? Atque.
+                  Who knew a little bit of Beating someone else could bring so
+                  much joy? 😄 What’s your go-to weekend pick-me-up? Share your
+                  fun ideas below—I’m always looking for new ways to spice up my
+                  weekends! 🎉
                 </p>
               </div>
             </div>

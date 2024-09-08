@@ -12,9 +12,9 @@ const ProfileCard = () => {
           <AvatarFallback>OK</AvatarFallback>
         </Avatar>
 
-        <h2 className="text-xl font-bold mb-2">Ogeday Kostenci</h2>
+        <h2 className="text-xl font-bold mb-2">Paul Sho</h2>
 
-        <p className="text-gray-400 text-sm mb-4">Simple Bio</p>
+        <p className="text-gray-400 text-sm mb-4 text-center">Ayawg tanduga natulog ko nga oten</p>
 
         <div className="flex justify-between w-full mb-4">
           <div className="text-center divide-y">
