@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import "../../../public/css/fab.css";
+import { MessageCircleIcon } from "lucide-react";
 
 const DraggableFab = React.memo(({ disableDrag }) => {
   const [position, setPosition] = useState({ top: 0, left: 0 });
@@ -85,7 +86,7 @@ const DraggableFab = React.memo(({ disableDrag }) => {
       fabRef.current.classList.remove("right");
       fabRef.current.classList.add("left");
     } else {
-      setPosition((prev) => ({ ...prev, left: windowWidth - 60 }));
+      setPosition((prev) => ({ ...prev, left: windowWidth - 100 }));
       fabRef.current.classList.remove("left");
       fabRef.current.classList.add("right");
     }
@@ -120,10 +121,12 @@ const DraggableFab = React.memo(({ disableDrag }) => {
       style={{
         top: `${position.top}px`,
         left: `${position.left}px`,
+        fontSize: "25px",
+        color: "black",
       }}
       onMouseDown={handleMouseDown}
     >
-      +
+      <MessageCircleIcon />
     </div>
   );
 });

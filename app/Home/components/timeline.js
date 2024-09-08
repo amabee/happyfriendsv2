@@ -104,101 +104,101 @@ const CenterContent = () => {
   );
 };
 
-const RightContent = () => {
-  return (
-    <div class="content_right">
-      <div class="content_right_inner">
-        <div class="your_pages">
-          <h3>Your Pages</h3>
-          <i class="fas fa-ellipsis-h"></i>
-        </div>
-        <ul>
-          <li>
-            <a href="#">
-              <img
-                class="your_page_logo"
-                src="assets/codersbite.png"
-                alt="codersbite"
-              />
-              <span>Codersbite</span>
-            </a>
-          </li>
-          <li class="content_right_small_text">
-            <a href="#">
-              <i class="fas fa-bell"></i>
-              <span>5 Notifications</span>
-            </a>
-          </li>
-          <li class="content_right_small_text">
-            <a href="#">
-              <i class="fas fa-bullhorn"></i>
-              <span>Create Promotion</span>
-            </a>
-          </li>
-        </ul>
-        <div class="content_right_divider"></div>
-        <div class="birthdays">
-          <h3>Birthdays</h3>
-        </div>
-        <ul>
-          <li>
-            <a href="#">
-              <img src="assets/gift-box.png" alt="gift-box" />
-              <span>Jary Garson's birthday is today</span>
-            </a>
-          </li>
-        </ul>
-        <div class="content_right_divider"></div>
-        <div class="contacts">
-          <h3>Contacts</h3>
-          <div class="contact_icons">
-            <i class="fas fa-search"></i>
-            <i class="fas fa-ellipsis-h"></i>
-          </div>
-        </div>
-        <ul>
-          <li>
-            <a href="#">
-              <img src="assets/avatar1.png" alt="user" />
-              <span>John Doe</span>
-            </a>
-          </li>
-          <li>
-            <a href="#">
-              <img src="assets/avatar2.png" alt="user" />
-              <span>Zorah Makey</span>
-            </a>
-          </li>
-          <li>
-            <a href="#">
-              <img src="assets/avatar5.png" alt="user" />
-              <span>Kero Janre</span>
-            </a>
-          </li>
-          <li>
-            <a href="#">
-              <img src="assets/avatar3.png" alt="user" />
-              <span>Ube Yuri</span>
-            </a>
-          </li>
-          <li>
-            <a href="#">
-              <img src="assets/avatar4.png" alt="user" />
-              <span>Hosaa Mora</span>
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  );
-};
+// const RightContent = () => {
+//   return (
+//     <div class="content_right">
+//       <div class="content_right_inner">
+//         <div class="your_pages">
+//           <h3>Your Pages</h3>
+//           <i class="fas fa-ellipsis-h"></i>
+//         </div>
+//         <ul>
+//           <li>
+//             <a href="#">
+//               <img
+//                 class="your_page_logo"
+//                 src="assets/codersbite.png"
+//                 alt="codersbite"
+//               />
+//               <span>Codersbite</span>
+//             </a>
+//           </li>
+//           <li class="content_right_small_text">
+//             <a href="#">
+//               <i class="fas fa-bell"></i>
+//               <span>5 Notifications</span>
+//             </a>
+//           </li>
+//           <li class="content_right_small_text">
+//             <a href="#">
+//               <i class="fas fa-bullhorn"></i>
+//               <span>Create Promotion</span>
+//             </a>
+//           </li>
+//         </ul>
+//         <div class="content_right_divider"></div>
+//         <div class="birthdays">
+//           <h3>Birthdays</h3>
+//         </div>
+//         <ul>
+//           <li>
+//             <a href="#">
+//               <img src="assets/gift-box.png" alt="gift-box" />
+//               <span>Jary Garson's birthday is today</span>
+//             </a>
+//           </li>
+//         </ul>
+//         <div class="content_right_divider"></div>
+//         <div class="contacts">
+//           <h3>Contacts</h3>
+//           <div class="contact_icons">
+//             <i class="fas fa-search"></i>
+//             <i class="fas fa-ellipsis-h"></i>
+//           </div>
+//         </div>
+//         <ul>
+//           <li>
+//             <a href="#">
+//               <img src="assets/avatar1.png" alt="user" />
+//               <span>John Doe</span>
+//             </a>
+//           </li>
+//           <li>
+//             <a href="#">
+//               <img src="assets/avatar2.png" alt="user" />
+//               <span>Zorah Makey</span>
+//             </a>
+//           </li>
+//           <li>
+//             <a href="#">
+//               <img src="assets/avatar5.png" alt="user" />
+//               <span>Kero Janre</span>
+//             </a>
+//           </li>
+//           <li>
+//             <a href="#">
+//               <img src="assets/avatar3.png" alt="user" />
+//               <span>Ube Yuri</span>
+//             </a>
+//           </li>
+//           <li>
+//             <a href="#">
+//               <img src="assets/avatar4.png" alt="user" />
+//               <span>Hosaa Mora</span>
+//             </a>
+//           </li>
+//         </ul>
+//       </div>
+//     </div>
+//   );
+// };
 
 const TimeLine = () => {
   return (
     <div class="content">
       <LeftContent />
       <CenterContent />
-      <RightContent />
+      {/* <RightContent /> */}
       <FloatingSnapButton />
     </div>
   );
