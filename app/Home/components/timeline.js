@@ -15,11 +15,20 @@ const CenterContent = () => {
   return (
     <div class="content_center">
       <div className="center-scroll-container">
-       <StoriesCarousel/>
+        <StoriesCarousel />
         <div class="media_container">
           <div class="share">
             <div class="share_upSide">
-              <img src="assets/profile.png" alt="profile" />
+              <img
+                src="./images/avatar.jpg"
+                alt="profile"
+                style={{
+                  objectFit: "cover",
+                  height: "3rem",
+                  width: "3rem",
+                  borderRadius: "50%",
+                }}
+              />
               <input type="text" placeholder="What's on your mind, Ogeday?" />
             </div>
             <hr />
