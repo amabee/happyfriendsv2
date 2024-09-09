@@ -1,6 +1,15 @@
 // components/CreatePostModal.js
 import { useState } from "react";
 import { Transition } from "@headlessui/react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
+} from "@/components/ui/dropdown-menu";
 
 const CreatePostModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
@@ -84,9 +93,35 @@ const CreatePostModal = ({ isOpen, onClose }) => {
                     />
                   </svg>
                 </div>
-                <span className="font-semibold text-xs">Public</span>
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger>
+                    <span className="font-semibold text-xs text-white">
+                      Public
+                    </span>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="bg-gray-800 text-white border border-gray-700">
+                    <DropdownMenuCheckboxItem>
+                      Who can see this post?
+                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuCheckboxItem className="hover:bg-gray-700 cursor-pointer">
+                      Public
+                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem className="hover:bg-gray-700 cursor-pointer">
+                      Friends Only
+                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem className="hover:bg-gray-700 cursor-pointer">
+                      Only Me
+                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem className="hover:bg-gray-700 cursor-pointer">
+                      Friends Only
+                    </DropdownMenuCheckboxItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
                 <div>
-                  <svg
+                  {/* <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-4 w-4"
                     fill="none"
@@ -99,7 +134,7 @@ const CreatePostModal = ({ isOpen, onClose }) => {
                       strokeWidth="2"
                       d="M19 9l-7 7-7-7"
                     />
-                  </svg>
+                  </svg> */}
                 </div>
               </div>
             </div>
@@ -107,7 +142,7 @@ const CreatePostModal = ({ isOpen, onClose }) => {
           <div className="my-4">
             <textarea
               rows="3"
-              placeholder="What's on your mind, Shibbir?"
+              placeholder="What's on your mind, Paul?"
               className="w-full bg-transparent resize-none text-2xl text-white outline-none placeholder-gray-400 focus:placeholder-gray-500"
             />
           </div>

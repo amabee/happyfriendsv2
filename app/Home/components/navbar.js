@@ -11,6 +11,7 @@ import {
   BellDotIcon,
   MessageCircle,
 } from "lucide-react";
+import { TbMessage2 } from "react-icons/tb";
 
 const NavBar = () => {
   return (
@@ -54,7 +55,7 @@ const NavBar = () => {
         <div className="navbar_right">
           <div className="navbar_right_links">
             <CogIcon className="nav-link-icon" />
-            <MessageCircle className="nav-link-icon" />
+            <TbMessage2  className="nav-link-icon"/>
             <BellDotIcon className="nav-link-icon" />
           </div>
           <div className="navbar_right_profile">

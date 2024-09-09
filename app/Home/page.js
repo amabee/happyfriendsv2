@@ -12,7 +12,7 @@ import {
   PlusIcon,
 } from "lucide-react";
 import NavBar from "./components/navbar";
-import TimeLine from "./components/timeline";
+import TimeLine from "./TimelinePage/components/timeline";
 
 const Home = () => {
   const [activeModule, setActiveModule] = useState("timeline");

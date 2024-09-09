@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import FloatingSnapButton from "./draggableFab";
+import FloatingSnapButton from "../../components/draggableFab";
 import ProfileCard from "./ProfileCard";
 import StoriesCarousel from "./StoryCarousel";
 import "react-perfect-scrollbar/dist/css/styles.css";
@@ -40,9 +40,9 @@ const CenterContent = () => {
               />
               <button
                 type="button"
-                placeholder="What's on your mind, Paul?"
                 onClick={openModal}
                 className="px-4 py-2"
+                style={{ textAlign: "left" }}
               >
                 What's on your mind, Paul?
               </button>
