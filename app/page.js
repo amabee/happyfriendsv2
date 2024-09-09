@@ -56,6 +56,7 @@ export default function Login() {
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
         if (!success) {
+          console.log(message);
           throw new Error(message);
         }
 

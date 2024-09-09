@@ -1,30 +1,41 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState, useRef } from "react";
 import FloatingSnapButton from "../../components/draggableFab";
 import ProfileCard from "./ProfileCard";
 import StoriesCarousel from "./StoryCarousel";
 import "react-perfect-scrollbar/dist/css/styles.css";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import { useState } from "react";
 import CreatePostModal from "./createPostModal";
-const LeftContent = () => {
+import { getPosts } from "../../lib/POST_PROCESS";
+import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+import { MessageSquare, Share, ThumbsUpIcon } from "lucide-react";
+import { IoMdShareAlt } from "react-icons/io";
+import EmojiPicker from "emoji-picker-react";
+import { Emoji, EmojiClickData, EmojiStyle } from "emoji-picker-react";
+import "../../../../public/css/emojistyles.css";
+
+const imageEndPoint = process.env.NEXT_PUBLIC_USER_IMAGES_ENDPOINT;
+const imagePostEndPoint = process.env.NEXT_PUBLIC_POST_IMAGES_ENDPOINT;
+
+const LeftContent = ({ data }) => {
   return (
     <div class="content_left">
-      <ProfileCard />
+      <ProfileCard data={data} />
     </div>
   );
 };
 
-const CenterContent = () => {
+const CenterContent = ({ postData }) => {
   const [isModalOpen, setModalOpen] = useState(false);
 
   const openModal = () => setModalOpen(true);
   const closeModal = () => setModalOpen(false);
+
   return (
     <div className="content_center">
       <PerfectScrollbar className="center-scroll-container">
         <StoriesCarousel />
-
         <div className="media_container">
           <div className="share">
             <div className="share_upSide">
@@ -64,65 +75,11 @@ const CenterContent = () => {
             </div>
           </div>
           {/* News feed */}
-          <div className="news_feed">
-            <div className="news_feed_title">
-              <img src="assets/user.png" alt="user" />
-              <div className="news_feed_title_content">
-                <p>Amabee</p>
-                <span>
-                  12h . <i className="fas fa-globe-americas"></i>
-                </span>
-              </div>
-            </div>
-            <div className="news_feed_description">
-              <p className="news_feed_subtitle">
-                ikaw ang bugtong itik na nagkapakapa sa malapokon kong dughan ug
-                ikaw ang ting ting sa nag ga bagting sa akong kasing kasing ug
-                saksi ang mga unggoy nga naglangoy langoy gilid sa hagunoy sa
-                akong gugmang ikaw ra ang gi ila💘💖
-              </p>
-              <img src="assets/sunflower.jpg" alt="sunflower" />
-              <div className="news_feed_description_title">
-                <span>GitHub / Amabee</span>
-                <p>
-                  Who knew a little bit of Beating someone else could bring so
-                  much joy? 😄 What’s your go-to weekend pick-me-up? Share your
-                  fun ideas below—I’m always looking for new ways to spice up my
-                  weekends! 🎉
-                </p>
-              </div>
-            </div>
-
-            <div className="likes_area">
-              <div className="emojis">
-                <img src="assets/emoji_like.png" alt="like" />
-                <img src="assets/emoji_surprised.png" alt="surprised" />
-                <img src="assets/emoji_angry.png" alt="angry" />
-                <span>25</span>
-              </div>
-              <div className="comment_counts">
-                <span>4 Comments</span> <span>13 Shares</span>
-              </div>
-            </div>
-
-            <div className="divider">
-              <hr />
-            </div>
-            <div className="likes_buttons">
-              <div className="likes_buttons_links">
-                <i className="far fa-thumbs-up"></i>
-                <span>Like</span>
-              </div>
-              <div className="likes_buttons_links">
-                <i className="far fa-comment-alt"></i>
-                <span>Comment</span>
-              </div>
-              <div className="likes_buttons_links">
-                <i className="fas fa-share"></i>
-                <span>Share</span>
-              </div>
-            </div>
-          </div>
+          {postData && postData.length > 0 ? (
+            postData.map((post) => <NewsFeed post={post} key={post.id} />)
+          ) : (
+            <p>No posts available</p>
+          )}
         </div>
         <CreatePostModal isOpen={isModalOpen} onClose={closeModal} />
       </PerfectScrollbar>
@@ -130,101 +87,213 @@ const CenterContent = () => {
   );
 };
 
-// const RightContent = () => {
-//   return (
-//     <div class="content_right">
-//       <div class="content_right_inner">
-//         <div class="your_pages">
-//           <h3>Your Pages</h3>
-//           <i class="fas fa-ellipsis-h"></i>
-//         </div>
-//         <ul>
-//           <li>
-//             <a href="#">
-//               <img
-//                 class="your_page_logo"
-//                 src="assets/codersbite.png"
-//                 alt="codersbite"
-//               />
-//               <span>Codersbite</span>
-//             </a>
-//           </li>
-//           <li class="content_right_small_text">
-//             <a href="#">
-//               <i class="fas fa-bell"></i>
-//               <span>5 Notifications</span>
-//             </a>
-//           </li>
-//           <li class="content_right_small_text">
-//             <a href="#">
-//               <i class="fas fa-bullhorn"></i>
-//               <span>Create Promotion</span>
-//             </a>
-//           </li>
-//         </ul>
-//         <div class="content_right_divider"></div>
-//         <div class="birthdays">
-//           <h3>Birthdays</h3>
-//         </div>
-//         <ul>
-//           <li>
-//             <a href="#">
-//               <img src="assets/gift-box.png" alt="gift-box" />
-//               <span>Jary Garson's birthday is today</span>
-//             </a>
-//           </li>
-//         </ul>
-//         <div class="content_right_divider"></div>
-//         <div class="contacts">
-//           <h3>Contacts</h3>
-//           <div class="contact_icons">
-//             <i class="fas fa-search"></i>
-//             <i class="fas fa-ellipsis-h"></i>
-//           </div>
-//         </div>
-//         <ul>
-//           <li>
-//             <a href="#">
-//               <img src="assets/avatar1.png" alt="user" />
-//               <span>John Doe</span>
-//             </a>
-//           </li>
-//           <li>
-//             <a href="#">
-//               <img src="assets/avatar2.png" alt="user" />
-//               <span>Zorah Makey</span>
-//             </a>
-//           </li>
-//           <li>
-//             <a href="#">
-//               <img src="assets/avatar5.png" alt="user" />
-//               <span>Kero Janre</span>
-//             </a>
-//           </li>
-//           <li>
-//             <a href="#">
-//               <img src="assets/avatar3.png" alt="user" />
-//               <span>Ube Yuri</span>
-//             </a>
-//           </li>
-//           <li>
-//             <a href="#">
-//               <img src="assets/avatar4.png" alt="user" />
-//               <span>Hosaa Mora</span>
-//             </a>
-//           </li>
-//         </ul>
-//       </div>
-//     </div>
-//   );
-// };
+const NewsFeed = ({ post }) => {
+  const [selectedEmoji, setSelectedEmoji] = useState(null);
+  const [emojiPickerVisible, setEmojiPickerVisible] = useState(false);
+  const [showAllEmojis, setShowAllEmojis] = useState(false);
 
-const TimeLine = () => {
+  const toggleEmojiPicker = () => {
+    setEmojiPickerVisible((prevState) => !prevState);
+  };
+
+  const handleEmojiClick = (emojiType) => {
+    setSelectedEmoji(emojiType);
+    setEmojiPickerVisible(false);
+  };
+
+  const handlePlusButtonClick = () => {
+    setShowAllEmojis(true);
+  };
+
+  const customEmojis = [
+    {
+      unified: "1f44d",
+      name: "Thumbs Up",
+      keywords: ["like", "positive", "agree"],
+      imageUrl:
+        "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Hand%20gestures/Thumbs%20Up%20Medium-Light%20Skin%20Tone.png",
+    },
+    {
+      unified: "2764-fe0f",
+      name: "Red Heart",
+      keywords: ["love", "heart"],
+      imageUrl:
+        "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Pink%20Heart.png",
+    },
+    {
+      unified: "1f602",
+      name: "Face with Tears of Joy",
+      keywords: ["laugh", "funny", "haha"],
+      imageUrl:
+        "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Face%20with%20Tears%20of%20Joy.png",
+    },
+    {
+      unified: "1f632",
+      name: "Astonished Face",
+      keywords: ["wow", "surprised", "shocked"],
+      imageUrl:
+        "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Astonished%20Face.png",
+    },
+    {
+      unified: "1f622",
+      name: "Crying Face",
+      keywords: ["cry", "sad", "upset"],
+      imageUrl:
+        "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Face%20Holding%20Back%20Tears.png",
+    },
+    {
+      unified: "1f621",
+      name: "Pouting Face",
+      keywords: ["angry", "mad", "rage"],
+      imageUrl:
+        "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Angry%20Face.png",
+    },
+  ];
+
   return (
-    <div class="content">
-      <LeftContent />
-      <CenterContent />
-      {/* <RightContent /> */}
+    <div key={post.id} className="news_feed">
+      <div className="news_feed_title">
+        <img
+          src={imageEndPoint + post.original_post_pfp}
+          alt="user"
+          style={{
+            borderRadius: "50%",
+            width: "50px",
+            height: "50px",
+            objectFit: "cover",
+          }}
+        />
+        <div className="news_feed_title_content">
+          <p>{`${post.original_post_firstname} ${post.original_post_lastname}`}</p>
+          <span>
+            {new Date(post.original_created_at).toLocaleString()} .
+            <i className="fas fa-globe-americas"></i>
+          </span>
+        </div>
+      </div>
+      <div className="news_feed_description">
+        <p className="news_feed_subtitle">{post.post_content}</p>
+        {post.image_names && post.image_names.length > 0 && (
+          <img src={imagePostEndPoint + post.image_names[0]} alt="post" />
+        )}
+      </div>
+      <div className="likes_area">
+        <div className="emojis">
+          <img src="assets/emoji_like.png" alt="like" />
+          <img src="assets/emoji_surprised.png" alt="surprised" />
+          <img src="assets/emoji_angry.png" alt="angry" />
+          <span>{post.original_reaction_count}</span>
+        </div>
+        <div className="comment_counts">
+          <span>
+            {post.original_comments
+              ? post.original_comments.split("|").length
+              : 0}{" "}
+            Comments
+          </span>{" "}
+          <span>{post.shared_reaction_count} Shares</span>
+        </div>
+      </div>
+      <div className="divider">
+        <hr />
+      </div>
+      <div className="likes_buttons">
+        <div
+          className="likes_buttons_links"
+          onMouseEnter={() => setEmojiPickerVisible(true)}
+          onMouseLeave={() => setEmojiPickerVisible(false)}
+        >
+          <ThumbsUpIcon className="mr-2" />
+          <span>Like</span>
+          {emojiPickerVisible && (
+            <div
+              className="emoji-picker-container"
+              onMouseEnter={() => setEmojiPickerVisible(true)}
+              onMouseLeave={() => setEmojiPickerVisible(false)}
+            >
+              {customEmojis.map((emoji) => (
+                <div
+                  key={emoji.unified}
+                  className={`emoji ${
+                    selectedEmoji === emoji.name ? "selected" : ""
+                  }`}
+                  onClick={() => handleEmojiClick(emoji.name)}
+                >
+                  {emoji.imageUrl ? (
+                    <img src={emoji.imageUrl} alt={emoji.name} />
+                  ) : (
+                    <div className="emoji-symbol">
+                      {String.fromCodePoint(parseInt(emoji.unified, 16))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="likes_buttons_links">
+          <MessageSquare className="mr-2" />
+          <span>Comment</span>
+        </div>
+        <div className="likes_buttons_links">
+          <IoMdShareAlt className="mr-2" />
+          <span>Share</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const TimeLine = ({ data }) => {
+  const [postsDatas, setPostsDatas] = useState();
+  const { toast } = useToast();
+  const uid = data?.user_id;
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        if (!uid) {
+          console.error("UID is not available");
+          return;
+        }
+
+        const { success, message, data } = await getPosts({ userID: uid });
+
+        if (!success) {
+          console.log("ERROR?", uid);
+          console.log("ERROR MESSAGE: ", message);
+          return;
+        }
+
+        if (success) {
+          setPostsDatas(data);
+          console.log("Success Data: ", message);
+        } else {
+          setPostsDatas(message);
+          console.log("Error Data: ", message);
+        }
+      } catch (err) {
+        console.log(err);
+        toast({
+          variant: "destructive",
+          title: "Whoops! something went wrong",
+          description: "An error occurred while fetching posts. " + err,
+          className: cn(
+            "fixed bottom-0 left-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4  sm:right-0  sm:flex-col md:max-w-[420px] data-[state=closed]:slide-out-to-left-full bottom-0 left-0"
+          ),
+        });
+      }
+    };
+
+    if (uid) {
+      fetchPosts();
+    }
+  }, [uid]); // Add uid as a dependency
+
+  return (
+    <div className="content">
+      <LeftContent data={data} />
+      <CenterContent postData={postsDatas} />
       <FloatingSnapButton />
     </div>
   );

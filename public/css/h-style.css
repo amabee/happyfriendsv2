@@ -384,7 +384,7 @@ body {
   width: 38px;
 }
 
-.share_upSide button{
+.share_upSide button {
   flex: 1;
   padding: 12px 0 12px 12px;
   background: #3a3b3c;
@@ -392,9 +392,7 @@ body {
   border-radius: 25px;
   font-size: 16px;
   color: #a8abaf;
-
 }
-
 
 .share_upSide button:focus {
   outline: none;
@@ -457,6 +455,7 @@ body {
   background-color: #242526;
   border-radius: 10px;
   margin: 15px 0;
+  height: auto;
 }
 
 .news_feed_title {
@@ -486,13 +485,15 @@ body {
 }
 
 .news_feed_description {
-  min-height: 400px;
+  max-height: 500px;
+  /* min-height: 150px; */
+  height: auto;
 }
 
 .news_feed_subtitle {
   padding: 0 15px;
   color: #e4e6eb;
-  font-size: 15px;
+  font-size: 18px;
   text-align: left;
   margin-bottom: 15px;
 }

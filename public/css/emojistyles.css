@@ -1,0 +1,40 @@
+.emoji-picker-container {
+  position: absolute;
+  background-color: #1e1e1e;
+  border-radius: 25px;
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+  padding: 8px;
+  z-index: 100;
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: row;
+  overflow: visible; /* Allow content to overflow outside the container */
+  width: 25rem;
+  height: 3.5rem;
+  left: 3rem;
+  transform-origin: top center;
+  transform: translate(10px, -45px);
+  transition: transform 0.3s ease-in-out;
+  justify-content: space-evenly;
+}
+
+.emoji {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.emoji img {
+  display: block;
+  width: 50px;
+  height: 50px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.emoji img:hover {
+  transform: translateY(-8px) scale(1.2); /* Moves emoji upwards and scales it for zoom-in effect */
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2); /* Adds shadow for depth */
+  z-index: 9999; /* Ensures the emoji floats above other elements */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for both transform and shadow */
+}

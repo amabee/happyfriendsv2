@@ -7,7 +7,7 @@ const DraggableFab = React.memo(({ disableDrag }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [isFabActive, setIsFabActive] = useState(false);
-  const [unreadMessages, setUnreadMessages] = useState(0);
+  const [unreadMessages, setUnreadMessages] = useState(4);
   const animationFrameId = useRef(null);
   const fabRef = useRef(null);
 
@@ -29,7 +29,6 @@ const DraggableFab = React.memo(({ disableDrag }) => {
     }
   }, [unreadMessages]);
 
-  console.log(unreadMessages);
 
   const handleMouseDown = (e) => {
     if (disableDrag) return;
