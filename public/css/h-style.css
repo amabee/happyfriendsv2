@@ -6,7 +6,7 @@ body {
   font-family: "Segoe UI";
   box-sizing: border-box;
   background: #18191a;
-  overflow-x: hidden;
+  overflow-x: hidden !important;
 }
 
 .navbar {
@@ -172,6 +172,8 @@ body {
   align-items: flex-start;
   width: 100vw;
   margin-top: 2rem;
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
 
 .content_left,
@@ -186,8 +188,6 @@ body {
   padding-left: 10px;
   top: 0;
   left: 0;
-  overflow: hidden;
-  /* background: #242526; */
   margin-top: 3rem;
 }
 
@@ -205,7 +205,6 @@ body {
   position: fixed;
   top: 0;
   right: 0;
-  overflow-y: scroll;
   margin-top: 3rem;
 }
 
@@ -307,12 +306,12 @@ body {
   align-items: center;
   max-width: 600px;
   margin: 0 auto;
-  overflow: hidden; /* Ensure content doesn't overflow */
+  overflow: hidden;
 }
 
 .stories-wrapper {
   width: 100%;
-  overflow: hidden; /* Hide anything that overflows this container */
+  overflow: hidden;
 }
 
 .stories-container {
@@ -322,14 +321,21 @@ body {
 }
 
 .story-item {
-  flex: 0 0 calc(100% / 5);
-  padding: 10px;
+  flex: 0 0 calc(100% / 4);
+  padding: 5px;
 }
 
 .story-item img {
   width: 100%;
   height: auto;
   border-radius: 10px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.story-item img:hover {
+  transform: translateY(-10px) scale(1.05);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
 }
 
 .carousel-button {
@@ -349,10 +355,12 @@ body {
 
 .carousel-button.prev {
   left: 10px;
+  background-color: #242526;
 }
 
 .carousel-button.next {
   right: 10px;
+  background-color: #242526;
 }
 
 .media_container {
@@ -367,7 +375,7 @@ body {
 
 .share_upSide {
   display: flex;
-  align-items: center;
+  align-items: start;
   margin-bottom: 15px;
 }
 
@@ -376,7 +384,7 @@ body {
   width: 38px;
 }
 
-.share_upSide input {
+.share_upSide button{
   flex: 1;
   padding: 12px 0 12px 12px;
   background: #3a3b3c;
@@ -384,9 +392,11 @@ body {
   border-radius: 25px;
   font-size: 16px;
   color: #a8abaf;
+
 }
 
-.share_upSide input:focus {
+
+.share_upSide button:focus {
   outline: none;
 }
 
@@ -545,8 +555,12 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 5px 15px;
+  padding: 10px 10px;
   height: 35px;
+}
+
+.likes_buttons:hover {
+  cursor: pointer;
 }
 
 .likes_buttons_links {

@@ -48,7 +48,7 @@ const StoriesCarousel = () => {
   return (
     <div className="stories-carousel">
       <button onClick={debouncedPrevSlide} className="carousel-button prev">
-        <ChevronLeft size={24} />
+        <ChevronLeft size={24} style={{marginLeft:"5px"}}/>
       </button>
       <div className="stories-wrapper">
         <div
@@ -67,7 +67,7 @@ const StoriesCarousel = () => {
         </div>
       </div>
       <button onClick={debouncedNextSlide} className="carousel-button next">
-        <ChevronRight size={24} />
+        <ChevronRight size={24} style={{marginLeft:"5px"}}/>
       </button>
     </div>
   );

@@ -16,7 +16,7 @@ const ProfileCard = () => {
 
         <p className="text-gray-400 text-sm mb-4 text-center">Ayawg tanduga natulog ko nga oten</p>
 
-        <div className="flex justify-between w-full mb-4">
+        <div className="flex justify-around w-full mb-4">
           <div className="text-center divide-y">
             <p className="font-bold ">1.5K</p>
             <p className="text-xs text-gray-400">Followers</p>

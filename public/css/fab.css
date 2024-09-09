@@ -1,9 +1,8 @@
-/* fab.css */
 .fab {
   position: fixed;
   width: 50px;
   height: 50px;
-  background-color: lightgray;
+  background-color: #3498db;
   color: white;
   border-radius: 50%;
   display: flex;
@@ -13,7 +12,10 @@
   z-index: 1000;
   user-select: none;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.fab.bounce {
+  animation: bounce 1s infinite;
 }
 
 .fab-active {
@@ -21,16 +23,60 @@
 }
 
 .fab:hover {
-  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.3);
-  transform: translateY(-4px);
-  background-color: gray;
+  background-color: #2980b9;
 }
 
-/* .left {
-    left: 30px;
+.fab-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #ff4136;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
   }
-  
-  .right {
-    left: calc(100vw - 60px);
+  50% {
+    transform: translateY(-15px);
+    box-shadow: 0px 15px 10px rgba(0, 0, 0, 0.1);
   }
-   */
+}
+
+.fab::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 10px;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0) 70%);
+  border-radius: 50%;
+  animation: shadow 1s infinite;
+}
+
+.fab.bounce::after {
+  animation: shadow 1s infinite;
+}
+
+@keyframes shadow {
+  0%, 100% {
+    transform: translateX(-50%) scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateX(-50%) scale(0.8);
+    opacity: 0.2;
+  }
+}

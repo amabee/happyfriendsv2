@@ -7,6 +7,7 @@ const DraggableFab = React.memo(({ disableDrag }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [isFabActive, setIsFabActive] = useState(false);
+  const [unreadMessages, setUnreadMessages] = useState(0);
   const animationFrameId = useRef(null);
   const fabRef = useRef(null);
 
@@ -16,15 +17,23 @@ const DraggableFab = React.memo(({ disableDrag }) => {
       setPosition(savedPosition);
     } else {
       setPosition({
-        top: window.innerHeight - 60,
-        left: window.innerWidth - 60,
+        top: window.innerHeight - 100,
+        left: window.innerWidth - 80,
       });
     }
   }, []);
 
+  useEffect(() => {
+    if (unreadMessages === 0 && fabRef.current) {
+      fabRef.current.classList.remove("bounce");
+    }
+  }, [unreadMessages]);
+
+  console.log(unreadMessages);
+
   const handleMouseDown = (e) => {
-    e.preventDefault();
     if (disableDrag) return;
+    e.preventDefault();
     e.stopPropagation();
     setIsDragging(true);
     setOffset({
@@ -36,33 +45,38 @@ const DraggableFab = React.memo(({ disableDrag }) => {
     }
   };
 
-  const handleMouseMove = (e) => {
-    e.preventDefault();
-    if (isDragging) {
+  const handleMouseMove = useCallback(
+    (e) => {
+      if (!isDragging) return;
+      e.preventDefault();
       if (animationFrameId.current) {
         cancelAnimationFrame(animationFrameId.current);
       }
       animationFrameId.current = requestAnimationFrame(() => {
-        setPosition((prev) => ({
+        setPosition({
           top: e.clientY - offset.y,
           left: e.clientX - offset.x,
-        }));
+        });
       });
-    }
-  };
+    },
+    [isDragging, offset]
+  );
 
-  const handleMouseUp = (e) => {
-    e.preventDefault();
-    setIsDragging(false);
-    if (animationFrameId.current) {
-      cancelAnimationFrame(animationFrameId.current);
-      animationFrameId.current = null;
-    }
-    snapToSide(e);
-  };
+  const handleMouseUp = useCallback(
+    (e) => {
+      if (!isDragging) return;
+      e.preventDefault();
+      setIsDragging(false);
+      if (animationFrameId.current) {
+        cancelAnimationFrame(animationFrameId.current);
+        animationFrameId.current = null;
+      }
+      snapToSide(e);
+    },
+    [isDragging]
+  );
 
   const snapToSide = useCallback((e) => {
-    e.preventDefault();
     const windowWidth = window.innerWidth;
     const wrapperHeight = window.innerHeight;
     let currPositionX, currPositionY;
@@ -95,38 +109,48 @@ const DraggableFab = React.memo(({ disableDrag }) => {
   }, []);
 
   useEffect(() => {
-    const handleMouseMoveGlobal = (e) => {
+    const handleGlobalMouseMove = (e) => {
       if (isDragging) {
-        e.preventDefault();
         handleMouseMove(e);
         localStorage.setItem("fabPosition", JSON.stringify(position));
       }
     };
 
-    const handleMouseUpGlobal = (e) => handleMouseUp(e);
+    const handleGlobalMouseUp = (e) => {
+      if (isDragging) {
+        handleMouseUp(e);
+      }
+    };
 
-    window.addEventListener("mousemove", handleMouseMoveGlobal);
-    window.addEventListener("mouseup", handleMouseUpGlobal);
+    if (isDragging) {
+      window.addEventListener("mousemove", handleGlobalMouseMove);
+      window.addEventListener("mouseup", handleGlobalMouseUp);
+    }
 
     return () => {
-      window.removeEventListener("mousemove", handleMouseMoveGlobal);
-      window.removeEventListener("mouseup", handleMouseUpGlobal);
+      window.removeEventListener("mousemove", handleGlobalMouseMove);
+      window.removeEventListener("mouseup", handleGlobalMouseUp);
     };
-  }, [isDragging, position]);
+  }, [isDragging, handleMouseMove, handleMouseUp]);
+
+  const Badge = ({ count }) => <div className="fab-badge">{count}</div>;
 
   return (
     <div
       ref={fabRef}
-      className={`fab ${isFabActive ? "fab-active" : ""}`}
+      className={`fab ${isFabActive ? "fab-active" : ""} ${
+        unreadMessages > 0 ? "bounce" : ""
+      }`}
       style={{
-        top: `${position.top}px`,
-        left: `${position.left}px`,
+        top: position.top ? `${position.top}px` : window.innerHeight - 100,
+        left: position.left ? `${position.left}px` : window.innerHeight - 80,
         fontSize: "25px",
         color: "black",
       }}
       onMouseDown={handleMouseDown}
     >
       <MessageCircleIcon />
+      {unreadMessages > 0 && <Badge count={unreadMessages} />}
     </div>
   );
 });
