@@ -8,6 +8,7 @@ export const createPost = async ({ formData }) => {
       url: POSTS_ENDPOINT,
       method: "POST",
       data: formData,
+      headers: { "Content-Type": "multipart/form-data" },
     });
 
     if (res.status !== 200) {
@@ -22,17 +23,17 @@ export const createPost = async ({ formData }) => {
       return {
         success: true,
         message: "Post Submitted",
-        data: res.data.success,
+        data: null,
       };
     } else {
-      return { success: false, message: res.data.message, data: null };
+      return { success: false, message: JSON.stringify(res.data), data: null };
     }
   } catch (e) {
     return { success: false, message: e, data: null };
   }
 };
 
-export const getPosts = async ({userID}) => {
+export const getPosts = async ({ userID }) => {
   try {
     const res = await axios.get(POSTS_ENDPOINT, {
       params: {

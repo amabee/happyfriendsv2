@@ -7,7 +7,7 @@ const DraggableFab = React.memo(({ disableDrag }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [isFabActive, setIsFabActive] = useState(false);
-  const [unreadMessages, setUnreadMessages] = useState(4);
+  const [unreadMessages, setUnreadMessages] = useState(0);
   const animationFrameId = useRef(null);
   const fabRef = useRef(null);
 
@@ -148,7 +148,7 @@ const DraggableFab = React.memo(({ disableDrag }) => {
       }}
       onMouseDown={handleMouseDown}
     >
-      <MessageCircleIcon />
+      <MessageCircleIcon size={35}/>
       {unreadMessages > 0 && <Badge count={unreadMessages} />}
     </div>
   );

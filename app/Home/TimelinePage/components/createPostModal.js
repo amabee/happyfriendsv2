@@ -1,5 +1,4 @@
-// components/CreatePostModal.js
-import { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Transition } from "@headlessui/react";
 import {
   DropdownMenu,
@@ -10,9 +9,59 @@ import {
   DropdownMenuTrigger,
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
+import { createPost } from "../../lib/POST_PROCESS";
+import { MainToastNotif } from "@/app/components/MainToast";
 
-const CreatePostModal = ({ isOpen, onClose }) => {
+const CreatePostModal = ({ isOpen, onClose, uid }) => {
   if (!isOpen) return null;
+  const [postContent, setPostContent] = useState("");
+  const [selectedImages, setSelectedImages] = useState([]);
+  const fileInputRef = useRef(null);
+
+  const handleCreatePostClick = async () => {
+    const formData = new FormData();
+    formData.append("operation", "createPost");
+
+    // Add JSON data
+    formData.append(
+      "json",
+      JSON.stringify({
+        user_id: uid,
+        content: postContent,
+      })
+    );
+
+    if (selectedImages.length > 0) {
+      selectedImages.forEach((image) => {
+        formData.append("images[]", image);
+      });
+    }
+
+    const { success, message, data } = await createPost({ formData });
+
+    if (!success) {
+      return alert(message);
+    }
+
+    MainToastNotif("Post Created!", "success");
+
+    setPostContent("");
+    setSelectedImages([]);
+    onClose();
+  };
+
+  const handleImageClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleImageChange = (event) => {
+    const files = Array.from(event.target.files);
+    setSelectedImages([...selectedImages, ...files]);
+  };
+
+  const removeImage = (index) => {
+    setSelectedImages(selectedImages.filter((_, i) => i !== index));
+  };
 
   return (
     <Transition
@@ -77,7 +126,7 @@ const CreatePostModal = ({ isOpen, onClose }) => {
             </div>
 
             <div className="flex flex-col space-y-0.5 items-start">
-              <h2 className="font-semibold text-sm">Paul?</h2>
+              <h2 className="font-semibold text-sm">Paul</h2>
               <div className="bg-gray-700 rounded-md px-1 flex space-x-0.5 py-1 items-center cursor-pointer">
                 <div>
                   <svg
@@ -114,28 +163,8 @@ const CreatePostModal = ({ isOpen, onClose }) => {
                     <DropdownMenuCheckboxItem className="hover:bg-gray-700 cursor-pointer">
                       Only Me
                     </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem className="hover:bg-gray-700 cursor-pointer">
-                      Friends Only
-                    </DropdownMenuCheckboxItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-
-                <div>
-                  {/* <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg> */}
-                </div>
               </div>
             </div>
           </div>
@@ -143,7 +172,11 @@ const CreatePostModal = ({ isOpen, onClose }) => {
             <textarea
               rows="3"
               placeholder="What's on your mind, Paul?"
-              className="w-full bg-transparent resize-none text-2xl text-white outline-none placeholder-gray-400 focus:placeholder-gray-500"
+              className="w-full bg-transparent resize-none text-2xl 
+              text-white outline-none 
+              placeholder-gray-400 focus:placeholder-gray-500"
+              value={postContent}
+              onChange={(e) => setPostContent(e.target.value)}
             />
           </div>
           <div className="flex justify-between items-center">
@@ -170,7 +203,10 @@ const CreatePostModal = ({ isOpen, onClose }) => {
           <div className="border border-gray-700 rounded-lg mt-5 px-3 py-2.5 flex justify-between items-center w-full max-w-4xl mx-auto">
             <div className="font-semibold cursor-pointer">Add to Your Post</div>
             <div className="flex space-x-0.5">
-              <div className="bg-transparent hover:bg-gray-700 p-1 rounded-full transition-colors cursor-pointer">
+              <div
+                className="bg-transparent hover:bg-gray-700 p-1 rounded-full transition-colors cursor-pointer"
+                onClick={handleImageClick}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-7 w-7 text-green-500"
@@ -184,6 +220,14 @@ const CreatePostModal = ({ isOpen, onClose }) => {
                   />
                 </svg>
               </div>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleImageChange}
+                multiple
+                accept="image/*"
+                className="hidden"
+              />
               <div className="bg-transparent hover:bg-gray-700 p-1 rounded-full transition-colors cursor-pointer">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -261,7 +305,44 @@ const CreatePostModal = ({ isOpen, onClose }) => {
             </div>
           </div>
 
-          <button className="w-full bg-gray-600 mt-3 rounded-md py-2 text-gray-400 font-semibold text-sm">
+          {selectedImages.length > 0 && (
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              {selectedImages.map((image, index) => (
+                <div key={index} className="relative">
+                  <img
+                    src={URL.createObjectURL(image)}
+                    alt={`Selected ${index + 1}`}
+                    className="w-full h-32 object-cover rounded"
+                  />
+                  <button
+                    onClick={() => removeImage(index)}
+                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 
+                      111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 
+                      11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <button
+            className="w-full hover:bg-gray-700 bg-gray-600 mt-3 
+            rounded-md py-2 text-gray-400 font-semibold text-sm"
+            onClick={handleCreatePostClick}
+          >
             Post
           </button>
         </div>

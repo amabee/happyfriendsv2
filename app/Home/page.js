@@ -2,15 +2,6 @@
 import React, { useEffect, useState } from "react";
 import "../../public/css/h-style.css";
 import "../../public/css/globals.css";
-import {
-  SearchIcon,
-  HomeIcon,
-  Users2Icon,
-  Music2Icon,
-  PlayCircleIcon,
-  CogIcon,
-  PlusIcon,
-} from "lucide-react";
 import NavBar from "./components/navbar";
 import TimeLine from "./TimelinePage/components/timeline";
 import { getSession } from "@/lib/lib";
