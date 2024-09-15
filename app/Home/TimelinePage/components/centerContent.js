@@ -16,34 +16,80 @@ import {
   CarouselPrevious,
   CarouselApi,
 } from "@/components/ui/carousel";
+import { getUserReactions, likePost } from "../../lib/POST_PROCESS";
+import MainToast, { MainToastNotif } from "@/app/components/MainToast";
 
 const imageEndPoint = process.env.NEXT_PUBLIC_USER_IMAGES_ENDPOINT;
 const imagePostEndPoint = process.env.NEXT_PUBLIC_POST_IMAGES_ENDPOINT;
 
-const NewsFeed = ({ post }) => {
-  const [selectedEmoji, setSelectedEmoji] = useState(null);
+const NewsFeed = ({ post, uid }) => {
+  const [hasReacted, setHasReacted] = useState(false);
+  const [userReaction, setUserReaction] = useState(null);
   const [emojiPickerVisible, setEmojiPickerVisible] = useState(false);
-  const [showAllEmojis, setShowAllEmojis] = useState(false);
   const [current, setCurrent] = useState(1);
   const [count, setCount] = useState(post.image_names.length);
   const [api, setApi] = useState();
 
-  const toggleEmojiPicker = () => {
-    setEmojiPickerVisible((prevState) => !prevState);
-  };
+  useEffect(() => {
+    const checkUserReaction = async () => {
+      const { success, data } = await getUserReactions(uid);
+      if (success) {
+        const postReaction = data.find(
+          (reaction) => reaction.post_id === post.original_post_id
+        );
+        if (postReaction) {
+          setHasReacted(true);
+          setUserReaction(postReaction.reaction_type);
+        }
+      }
+    };
+    checkUserReaction();
+  }, [uid, post.original_post_id]);
 
-  const handleEmojiClick = (emojiType) => {
-    setSelectedEmoji(emojiType);
-    setEmojiPickerVisible(false);
-  };
+  useEffect(() => {
+    if (!api) {
+      return;
+    }
 
-  const handlePlusButtonClick = () => {
-    setShowAllEmojis(true);
+    const timer = setTimeout(() => {
+      setCurrent(api.selectedScrollSnap());
+      setCount(api.scrollSnapList().length);
+    }, 100);
+
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap());
+    });
+
+    return () => clearTimeout(timer);
+  }, [api]);
+
+  const handleEmojiClick = async (postID, emojiType) => {
+    const formData = new FormData();
+    formData.append("operation", "addReaction");
+    formData.append(
+      "json",
+      JSON.stringify({
+        post_id: postID,
+        user_id: uid,
+        reaction_type: emojiType,
+      })
+    );
+
+    const { success, message } = await likePost({ formData });
+
+    if (success) {
+      setHasReacted(true);
+      setUserReaction(emojiType);
+      MainToastNotif("You reacted to this post!", "success");
+    } else {
+      MainToastNotif(message, "error");
+    }
   };
 
   const customEmojis = [
     {
       unified: "1f44d",
+      type: "like",
       name: "Thumbs Up",
       keywords: ["like", "positive", "agree"],
       imageUrl:
@@ -51,6 +97,7 @@ const NewsFeed = ({ post }) => {
     },
     {
       unified: "2764-fe0f",
+      type: "love",
       name: "Red Heart",
       keywords: ["love", "heart"],
       imageUrl:
@@ -59,6 +106,7 @@ const NewsFeed = ({ post }) => {
     {
       unified: "1f602",
       name: "Face with Tears of Joy",
+      type: "haha",
       keywords: ["laugh", "funny", "haha"],
       imageUrl:
         "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Face%20with%20Tears%20of%20Joy.png",
@@ -66,6 +114,7 @@ const NewsFeed = ({ post }) => {
     {
       unified: "1f632",
       name: "Astonished Face",
+      type: "wow",
       keywords: ["wow", "surprised", "shocked"],
       imageUrl:
         "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Astonished%20Face.png",
@@ -73,6 +122,7 @@ const NewsFeed = ({ post }) => {
     {
       unified: "1f622",
       name: "Crying Face",
+      type: "sad",
       keywords: ["cry", "sad", "upset"],
       imageUrl:
         "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Face%20Holding%20Back%20Tears.png",
@@ -80,27 +130,36 @@ const NewsFeed = ({ post }) => {
     {
       unified: "1f621",
       name: "Pouting Face",
+      type: "angry",
       keywords: ["angry", "mad", "rage"],
       imageUrl:
         "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Angry%20Face.png",
     },
   ];
 
-  useEffect(() => {
-    if (!api) {
-      return;
+  const emojiMap = customEmojis.reduce((acc, emoji) => {
+    acc[emoji.type] = emoji.imageUrl;
+    return acc;
+  }, {});
+
+  const getReactedEmoji = () => {
+    return userReaction ? emojiMap[userReaction] : null;
+  };
+
+  const parseReactions = (reactionsString) => {
+    if (typeof reactionsString !== "string" || reactionsString.trim() === "") {
+      return [];
     }
 
-    setCount(api.scrollSnapList().length);
-    setCurrent(api.selectedScrollSnap() + 1);
-
-    api.on("select", () => {
-      setCurrent(api.selectedScrollSnap() + 1);
+    return reactionsString.split(", ").map((reaction) => {
+      const [type, count] = reaction.split(": ");
+      return { type, count: parseInt(count, 10) };
     });
-  }, [api]);
+  };
+  const reactionsDisplay = parseReactions(post.top_reactions);
 
   return (
-    <div key={post.id} className="news_feed">
+    <div key={post.original_post_id} className="news_feed">
       <div className="news_feed_title">
         <img
           src={imageEndPoint + post.original_post_pfp}
@@ -124,10 +183,10 @@ const NewsFeed = ({ post }) => {
         <p className="news_feed_subtitle">{post.post_content}</p>
 
         {post.image_names && post.image_names.length > 0 && (
-          <div>
+          <div className="news_feed_carousel relative">
             <Carousel
               setApi={setApi}
-              className="relative w-full"
+              className="w-full"
               onChange={(index) => {
                 console.log("Slide index:", index + 1);
                 setCurrent(index + 1);
@@ -146,25 +205,38 @@ const NewsFeed = ({ post }) => {
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              <div className="absolute top-1/2 left-4 transform -translate-y-1/2">
-                <CarouselPrevious className="text-white bg-black p-2 rounded-full" />
+              <div className="absolute inset-y-0 left-12 flex items-center">
+                <CarouselPrevious className="h-10 w-10 ml-2 bg-black/50 text-white hover:bg-black/70" />
               </div>
-              <div className="absolute top-1/2 right-8 transform -translate-y-1/2">
-                <CarouselNext className="text-white bg-black p-2 rounded-full" />
+              <div className="absolute inset-y-0 right-12 flex items-center">
+                <CarouselNext className="h-10 w-10 mr-2 bg-black/50 text-white hover:bg-black/70" />
               </div>
             </Carousel>
 
-            <div className="py-2 text-center text-sm text-muted-foreground">
-              Image {current} of {count}
+            <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
+              {post.image_names.map((_, index) => (
+                <button
+                  key={index}
+                  className={`h-2 w-2 rounded-full ${
+                    current === index ? "bg-white" : "bg-white/50"
+                  }`}
+                  onClick={() => api?.scrollTo(index)}
+                />
+              ))}
             </div>
           </div>
         )}
       </div>
       <div className="likes_area">
         <div className="emojis">
-          <img src="assets/emoji_like.png" alt="like" />
-          <img src="assets/emoji_surprised.png" alt="surprised" />
-          <img src="assets/emoji_angry.png" alt="angry" />
+          {reactionsDisplay.map((reaction, index) => (
+            <div key={index} className="emoji_reaction">
+              <img
+                src={emojiMap[reaction.type] || "assets/emoji_default.png"}
+                alt={reaction.type}
+              />
+            </div>
+          ))}
           <span>{post.original_reaction_count}</span>
         </div>
         <div className="comment_counts">
@@ -186,8 +258,17 @@ const NewsFeed = ({ post }) => {
           onMouseEnter={() => setEmojiPickerVisible(true)}
           onMouseLeave={() => setEmojiPickerVisible(false)}
         >
-          <ThumbsUpIcon className="mr-2" />
-          <span>Like</span>
+          {getReactedEmoji() ? (
+            <img
+              src={getReactedEmoji()}
+              alt="User Reaction"
+              className="mr-2"
+              style={{ width: "20px", height: "auto" }}
+            />
+          ) : (
+            <ThumbsUpIcon className="mr-2" />
+          )}
+          <span>{hasReacted ? "Liked" : "Like"}</span>
           {emojiPickerVisible && (
             <div
               className="emoji-picker-container"
@@ -198,17 +279,13 @@ const NewsFeed = ({ post }) => {
                 <div
                   key={emoji.unified}
                   className={`emoji ${
-                    selectedEmoji === emoji.name ? "selected" : ""
+                    userReaction === emoji.type ? "selected" : ""
                   }`}
-                  onClick={() => handleEmojiClick(emoji.name)}
+                  onClick={() =>
+                    handleEmojiClick(post.original_post_id, emoji.type)
+                  }
                 >
-                  {emoji.imageUrl ? (
-                    <img src={emoji.imageUrl} alt={emoji.name} />
-                  ) : (
-                    <div className="emoji-symbol">
-                      {String.fromCodePoint(parseInt(emoji.unified, 16))}
-                    </div>
-                  )}
+                  <img src={emoji.imageUrl} alt={emoji.name} loading="lazy" />
                 </div>
               ))}
             </div>
@@ -283,7 +360,9 @@ const CenterContent = ({ postData, uid }) => {
           </div>
           {/* News feed */}
           {postData && postData.length > 0 ? (
-            postData.map((post) => <NewsFeed post={post} key={post.id} />)
+            postData.map((post) => (
+              <NewsFeed post={post} key={post.id} uid={uid} />
+            ))
           ) : (
             <p>No posts available</p>
           )}
