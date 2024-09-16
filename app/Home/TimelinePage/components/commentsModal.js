@@ -51,7 +51,7 @@ const PostModal = ({ isOpen, onClose, post }) => {
                 <CarouselContent className="h-full">
                   {images.map((image, index) => (
                     <CarouselItem key={index} className="h-full flex items-center justify-center">
-                      <div className="w-full h-full flex items-center justify-center py-8">
+                      <div className="w-full h-full flex items-center justify-center">
                         <img
                           src={imagePostEndPoint + image}
                           alt={`Post image ${index + 1}`}
@@ -61,12 +61,8 @@ const PostModal = ({ isOpen, onClose, post }) => {
                     </CarouselItem>
                   ))}
                 </CarouselContent>
-                <div className="absolute inset-y-0 left-0 flex items-center">
-                  <CarouselPrevious className="h-full rounded-none bg-black/50 hover:bg-black/70" />
-                </div>
-                <div className="absolute inset-y-0 right-0 flex items-center">
-                  <CarouselNext className="h-full rounded-none bg-black/50 hover:bg-black/70" />
-                </div>
+                <CarouselPrevious className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white bg-black/50 hover:bg-black/70" />
+                <CarouselNext className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white bg-black/50 hover:bg-black/70" />
               </Carousel>
             )}
           </div>
