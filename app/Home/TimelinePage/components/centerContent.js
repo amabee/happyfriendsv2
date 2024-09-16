@@ -23,9 +23,21 @@ import {
   updateReaction,
 } from "../../lib/POST_PROCESS";
 import MainToast, { MainToastNotif } from "@/app/components/MainToast";
+import PostModal from "./commentsModal";
 
 const imageEndPoint = process.env.NEXT_PUBLIC_USER_IMAGES_ENDPOINT;
 const imagePostEndPoint = process.env.NEXT_PUBLIC_POST_IMAGES_ENDPOINT;
+
+const parseReactions = (reactionsString) => {
+  if (typeof reactionsString !== "string" || reactionsString.trim() === "") {
+    return [];
+  }
+
+  return reactionsString.split(", ").map((reaction) => {
+    const [type, count] = reaction.split(": ");
+    return { type, count: parseInt(count, 10) };
+  });
+};
 
 const NewsFeed = ({ post, uid }) => {
   const [hasReacted, setHasReacted] = useState(false);
@@ -34,6 +46,15 @@ const NewsFeed = ({ post, uid }) => {
   const [current, setCurrent] = useState(1);
   const [count, setCount] = useState(post.image_names.length);
   const [api, setApi] = useState();
+  const [reactions, setReactions] = useState(
+    parseReactions(post.top_reactions)
+  );
+  const [reactionCount, setReactionCount] = useState(
+    post.original_reaction_count
+  );
+  const [postModalOpen, setPostModalOpen] = useState();
+  const handlePostModalOpen = () => setPostModalOpen(true);
+  const handlePostModalClose = () => setPostModalOpen(false);
 
   useEffect(() => {
     const checkUserReaction = async () => {
@@ -71,30 +92,57 @@ const NewsFeed = ({ post, uid }) => {
   const handleEmojiClick = async (postID, emojiType) => {
     const formData = new FormData();
 
-    if (hasReacted) {
-      if (userReaction === emojiType) {
-        // Unlike/remove reaction
-        formData.append("operation", "removeReaction");
-        formData.append(
-          "json",
-          JSON.stringify({
-            post_id: postID,
-            user_id: uid,
-          })
-        );
+    try {
+      if (hasReacted) {
+        if (userReaction === emojiType) {
+          // Unlike/remove reaction
+          formData.append("operation", "removeReaction");
+          formData.append(
+            "json",
+            JSON.stringify({
+              post_id: postID,
+              user_id: uid,
+            })
+          );
 
-        const { success, message } = await removeReaction({ formData });
+          const { success, message } = await removeReaction({ formData });
 
-        if (success) {
-          setHasReacted(false);
-          setUserReaction(null);
-          MainToastNotif("Reaction removed!", "success");
+          if (success) {
+            setHasReacted(false);
+            setUserReaction(null);
+            updateReactionsDisplay(emojiType, -1);
+            MainToastNotif("Reaction removed!", "success");
+          } else {
+            console.error("Error removing reaction:", message);
+            MainToastNotif(message || "Error removing reaction", "error");
+          }
         } else {
-          MainToastNotif(message, "error");
+          // Update reaction
+          formData.append("operation", "updateReaction");
+          formData.append(
+            "json",
+            JSON.stringify({
+              post_id: postID,
+              user_id: uid,
+              reaction_type: emojiType,
+            })
+          );
+
+          const { success, message } = await updateReaction({ formData });
+
+          if (success) {
+            updateReactionsDisplay(userReaction, -1);
+            updateReactionsDisplay(emojiType, 1);
+            setUserReaction(emojiType);
+            MainToastNotif("Reaction updated!", "success");
+          } else {
+            console.error("Error updating reaction:", message);
+            MainToastNotif(message || "Error updating reaction", "error");
+          }
         }
       } else {
-        // Update reaction
-        formData.append("operation", "updateReaction");
+        // Add new reaction
+        formData.append("operation", "addReaction");
         formData.append(
           "json",
           JSON.stringify({
@@ -104,37 +152,41 @@ const NewsFeed = ({ post, uid }) => {
           })
         );
 
-        const { success, message } = await updateReaction({ formData });
+        const { success, message } = await likePost({ formData });
 
         if (success) {
+          setHasReacted(true);
           setUserReaction(emojiType);
-          MainToastNotif("Reaction updated!", "success");
+          updateReactionsDisplay(emojiType, 1);
+          MainToastNotif("You reacted to this post!", "success");
         } else {
-          MainToastNotif(message, "error");
+          console.error("Error adding reaction:", message);
+          MainToastNotif(message || "Error adding reaction", "error");
         }
       }
-    } else {
-      // Add new reaction
-      formData.append("operation", "addReaction");
-      formData.append(
-        "json",
-        JSON.stringify({
-          post_id: postID,
-          user_id: uid,
-          reaction_type: emojiType,
-        })
-      );
-
-      const { success, message } = await likePost({ formData });
-
-      if (success) {
-        setHasReacted(true);
-        setUserReaction(emojiType);
-        MainToastNotif("You reacted to this post!", "success");
-      } else {
-        MainToastNotif(message, "error");
-      }
+    } catch (error) {
+      console.error("Unexpected error in handleEmojiClick:", error);
+      MainToastNotif("An unexpected error occurred", "error");
     }
+  };
+
+  const updateReactionsDisplay = (emojiType, change) => {
+    setReactions((prevReactions) => {
+      const updatedReactions = [...prevReactions];
+      const existingReaction = updatedReactions.find(
+        (r) => r.type === emojiType
+      );
+      if (existingReaction) {
+        existingReaction.count += change;
+        if (existingReaction.count <= 0) {
+          return updatedReactions.filter((r) => r.type !== emojiType);
+        }
+      } else if (change > 0) {
+        updatedReactions.push({ type: emojiType, count: change });
+      }
+      return updatedReactions.sort((a, b) => b.count - a.count);
+    });
+    setReactionCount((prevCount) => prevCount + change);
   };
 
   const customEmojis = [
@@ -196,18 +248,6 @@ const NewsFeed = ({ post, uid }) => {
   const getReactedEmoji = () => {
     return userReaction ? emojiMap[userReaction] : null;
   };
-
-  const parseReactions = (reactionsString) => {
-    if (typeof reactionsString !== "string" || reactionsString.trim() === "") {
-      return [];
-    }
-
-    return reactionsString.split(", ").map((reaction) => {
-      const [type, count] = reaction.split(": ");
-      return { type, count: parseInt(count, 10) };
-    });
-  };
-  const reactionsDisplay = parseReactions(post.top_reactions);
 
   return (
     <div key={post.original_post_id} className="news_feed">
@@ -280,7 +320,7 @@ const NewsFeed = ({ post, uid }) => {
       </div>
       <div className="likes_area">
         <div className="emojis">
-          {reactionsDisplay.map((reaction, index) => (
+          {reactions.map((reaction, index) => (
             <div key={index} className="emoji_reaction">
               <img
                 src={emojiMap[reaction.type] || "assets/emoji_default.png"}
@@ -288,7 +328,7 @@ const NewsFeed = ({ post, uid }) => {
               />
             </div>
           ))}
-          <span>{post.original_reaction_count}</span>
+          <span>{reactionCount}</span>
         </div>
         <div className="comment_counts">
           <span>
@@ -356,7 +396,7 @@ const NewsFeed = ({ post, uid }) => {
             </div>
           )}
         </div>
-        <div className="likes_buttons_links">
+        <div className="likes_buttons_links" onClick={handlePostModalOpen}>
           <MessageSquare className="mr-2" />
           <span>Comment</span>
         </div>
@@ -365,6 +405,7 @@ const NewsFeed = ({ post, uid }) => {
           <span>Share</span>
         </div>
       </div>
+      <PostModal isOpen={postModalOpen} onClose={handlePostModalClose} post={post}/>
     </div>
   );
 };
