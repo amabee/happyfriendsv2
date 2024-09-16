@@ -29,7 +29,6 @@ const DraggableFab = React.memo(({ disableDrag }) => {
     }
   }, [unreadMessages]);
 
-
   const handleMouseDown = (e) => {
     if (disableDrag) return;
     e.preventDefault();
@@ -134,6 +133,17 @@ const DraggableFab = React.memo(({ disableDrag }) => {
 
   const Badge = ({ count }) => <div className="fab-badge">{count}</div>;
 
+  const positionTop = position.top
+    ? `${position.top}px`
+    : typeof window !== "undefined"
+    ? window.innerHeight - 100
+    : 0;
+
+  const positionLeft = position.left
+    ? `${position.left}px`
+    : typeof window !== "undefined"
+    ? window.innerHeight - 80
+    : 0;
   return (
     <div
       ref={fabRef}
@@ -141,14 +151,14 @@ const DraggableFab = React.memo(({ disableDrag }) => {
         unreadMessages > 0 ? "bounce" : ""
       }`}
       style={{
-        top: position.top ? `${position.top}px` : window.innerHeight - 100,
-        left: position.left ? `${position.left}px` : window.innerHeight - 80,
+        top: positionTop,
+        left: positionLeft,
         fontSize: "25px",
         color: "black",
       }}
       onMouseDown={handleMouseDown}
     >
-      <MessageCircleIcon size={35}/>
+      <MessageCircleIcon size={35} />
       {unreadMessages > 0 && <Badge count={unreadMessages} />}
     </div>
   );
