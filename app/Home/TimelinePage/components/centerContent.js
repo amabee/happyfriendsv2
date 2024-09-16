@@ -273,50 +273,60 @@ const NewsFeed = ({ post, uid }) => {
       <div className="news_feed_description">
         <p className="news_feed_subtitle">{post.post_content}</p>
 
-        {post.image_names && post.image_names.length > 0 && (
-          <div className="news_feed_carousel relative">
-            <Carousel
-              setApi={setApi}
-              className="w-full"
-              onChange={(index) => {
-                console.log("Slide index:", index + 1);
-                setCurrent(index + 1);
-              }}
-            >
-              <CarouselContent>
-                {post.image_names.map((imageName, index) => (
-                  <CarouselItem key={index}>
-                    <div className="p-1 flex items-center justify-center">
-                      <img
-                        src={imagePostEndPoint + imageName}
-                        alt={`post image ${index + 1}`}
-                        className="max-w-full max-h-full object-contain"
-                      />
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <div className="absolute inset-y-0 left-12 flex items-center">
-                <CarouselPrevious className="h-10 w-10 ml-2 bg-black/50 text-white hover:bg-black/70" />
-              </div>
-              <div className="absolute inset-y-0 right-12 flex items-center">
-                <CarouselNext className="h-10 w-10 mr-2 bg-black/50 text-white hover:bg-black/70" />
-              </div>
-            </Carousel>
-
-            <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
-              {post.image_names.map((_, index) => (
-                <button
-                  key={index}
-                  className={`h-2 w-2 rounded-full ${
-                    current === index ? "bg-white" : "bg-white/50"
-                  }`}
-                  onClick={() => api?.scrollTo(index)}
-                />
-              ))}
+        {post.image_names &&
+          post.image_names.length > 0 &&
+          (post.image_names.length === 1 ? (
+            <div className="p-1 flex items-center justify-center">
+              <img
+                src={imagePostEndPoint + post.image_names[0]}
+                alt="post image"
+                className="max-w-full max-h-full object-contain"
+              />
             </div>
-          </div>
-        )}
+          ) : (
+            <div className="news_feed_carousel relative">
+              <Carousel
+                setApi={setApi}
+                className="w-full"
+                onChange={(index) => {
+                  console.log("Slide index:", index + 1);
+                  setCurrent(index + 1);
+                }}
+              >
+                <CarouselContent>
+                  {post.image_names.map((imageName, index) => (
+                    <CarouselItem key={index}>
+                      <div className="p-1 flex items-center justify-center">
+                        <img
+                          src={imagePostEndPoint + imageName}
+                          alt={`post image ${index + 1}`}
+                          className="max-w-full max-h-full object-contain"
+                        />
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <div className="absolute inset-y-0 left-12 flex items-center">
+                  <CarouselPrevious className="h-10 w-10 ml-2 bg-black/50 text-white hover:bg-black/70" />
+                </div>
+                <div className="absolute inset-y-0 right-12 flex items-center">
+                  <CarouselNext className="h-10 w-10 mr-2 bg-black/50 text-white hover:bg-black/70" />
+                </div>
+              </Carousel>
+
+              <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
+                {post.image_names.map((_, index) => (
+                  <button
+                    key={index}
+                    className={`h-2 w-2 rounded-full ${
+                      current === index ? "bg-white" : "bg-white/50"
+                    }`}
+                    onClick={() => api?.scrollTo(index)}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
       </div>
       <div className="likes_area">
         <div className="emojis">
@@ -405,7 +415,11 @@ const NewsFeed = ({ post, uid }) => {
           <span>Share</span>
         </div>
       </div>
-      <PostModal isOpen={postModalOpen} onClose={handlePostModalClose} post={post}/>
+      <PostModal
+        isOpen={postModalOpen}
+        onClose={handlePostModalClose}
+        post={post}
+      />
     </div>
   );
 };
