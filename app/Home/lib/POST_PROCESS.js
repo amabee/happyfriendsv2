@@ -140,7 +140,11 @@ export const updateReaction = async ({ formData }) => {
     if (res.data.success) {
       return { success: true, message: res.data.success, data: null };
     } else {
-      return { success: false, message: res.data.error, data: null };
+      return {
+        success: false,
+        message: res.data.error,
+        data: null,
+      };
     }
   } catch (error) {
     return { success: false, message: "Exception Error", data: null };

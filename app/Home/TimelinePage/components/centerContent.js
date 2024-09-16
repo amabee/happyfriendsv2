@@ -16,7 +16,12 @@ import {
   CarouselPrevious,
   CarouselApi,
 } from "@/components/ui/carousel";
-import { getUserReactions, likePost } from "../../lib/POST_PROCESS";
+import {
+  getUserReactions,
+  likePost,
+  removeReaction,
+  updateReaction,
+} from "../../lib/POST_PROCESS";
 import MainToast, { MainToastNotif } from "@/app/components/MainToast";
 
 const imageEndPoint = process.env.NEXT_PUBLIC_USER_IMAGES_ENDPOINT;
@@ -65,24 +70,70 @@ const NewsFeed = ({ post, uid }) => {
 
   const handleEmojiClick = async (postID, emojiType) => {
     const formData = new FormData();
-    formData.append("operation", "addReaction");
-    formData.append(
-      "json",
-      JSON.stringify({
-        post_id: postID,
-        user_id: uid,
-        reaction_type: emojiType,
-      })
-    );
 
-    const { success, message } = await likePost({ formData });
+    if (hasReacted) {
+      if (userReaction === emojiType) {
+        // Unlike/remove reaction
+        formData.append("operation", "removeReaction");
+        formData.append(
+          "json",
+          JSON.stringify({
+            post_id: postID,
+            user_id: uid,
+          })
+        );
 
-    if (success) {
-      setHasReacted(true);
-      setUserReaction(emojiType);
-      MainToastNotif("You reacted to this post!", "success");
+        const { success, message } = await removeReaction({ formData });
+
+        if (success) {
+          setHasReacted(false);
+          setUserReaction(null);
+          MainToastNotif("Reaction removed!", "success");
+        } else {
+          MainToastNotif(message, "error");
+        }
+      } else {
+        // Update reaction
+        formData.append("operation", "updateReaction");
+        formData.append(
+          "json",
+          JSON.stringify({
+            post_id: postID,
+            user_id: uid,
+            reaction_type: emojiType,
+          })
+        );
+
+        const { success, message } = await updateReaction({ formData });
+
+        if (success) {
+          setUserReaction(emojiType);
+          MainToastNotif("Reaction updated!", "success");
+        } else {
+          MainToastNotif(message, "error");
+        }
+      }
     } else {
-      MainToastNotif(message, "error");
+      // Add new reaction
+      formData.append("operation", "addReaction");
+      formData.append(
+        "json",
+        JSON.stringify({
+          post_id: postID,
+          user_id: uid,
+          reaction_type: emojiType,
+        })
+      );
+
+      const { success, message } = await likePost({ formData });
+
+      if (success) {
+        setHasReacted(true);
+        setUserReaction(emojiType);
+        MainToastNotif("You reacted to this post!", "success");
+      } else {
+        MainToastNotif(message, "error");
+      }
     }
   };
 
@@ -268,7 +319,21 @@ const NewsFeed = ({ post, uid }) => {
           ) : (
             <ThumbsUpIcon className="mr-2" />
           )}
-          <span>{hasReacted ? "Liked" : "Like"}</span>
+          <span
+            onClick={() => {
+              if (hasReacted) {
+                handleEmojiClick(post.original_post_id, userReaction);
+              } else {
+                handleEmojiClick(post.original_post_id, "like");
+              }
+            }}
+          >
+            {hasReacted
+              ? userReaction === "like"
+                ? "Liked"
+                : "Reacted"
+              : "Like"}
+          </span>
           {emojiPickerVisible && (
             <div
               className="emoji-picker-container"
